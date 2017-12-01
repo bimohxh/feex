@@ -17,6 +17,9 @@ module.exports = {
   ** Customize the progress bar color
   */
   loading: { color: '#3B8070' },
+  css: [
+    '~assets/css/main.css'
+  ],
   /*
   ** Build configuration
   */
@@ -32,10 +35,10 @@ module.exports = {
           loader: 'eslint-loader',
           exclude: /(node_modules)/
         })
-
         const vueLoader = config.module.rules.find((rule) => rule.loader === 'vue-loader')
         vueLoader.options.loaders.sass = 'vue-style-loader!css-loader!sass-loader'
       }
     }
-  }
+  },
+  plugins: ['~/plugins/icon']
 }
