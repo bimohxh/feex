@@ -5,14 +5,14 @@
         h3 Vue.js 入门到精通
       div.middle
         div.view-vis
-          a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" :class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
+          a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" v-bind:class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
             icon(name="navicon" width="16") 目录
           // a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 代码
-          a(href="javascript:void(0)" @click="isRightShow = !isRightShow" :class="'oper-btn on-' + isRightShow")
+          a(href="javascript:void(0)" @click="isRightShow = !isRightShow" v-bind:class="'oper-btn on-' + isRightShow")
             icon(name="eye" width="15") 预览
 
       div.right
-        a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 实时预览
+        a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" v-bind:class="'oper-btn on-' + isRealTimePreview") 实时预览
         a(href="javascript:void(0)" @click="run")
           icon(name="run")
         
@@ -145,8 +145,8 @@ export default {
     require('codemirror/mode/javascript/javascript.js')
     require('codemirror/mode/css/css.js')
     require('codemirror/mode/htmlmixed/htmlmixed.js')
-    require('codemirror/addon/display/fullscreen.css')
-    require('codemirror/addon/display/fullscreen.js')
+    require('codemirror/addon/comment/comment.js')
+    require('codemirror/keymap/sublime.js')
 
     editor = CodeMirror.fromTextArea(document.getElementById('code'), {
       mode: 'text/html',
@@ -154,14 +154,7 @@ export default {
       inputStyle: 'contenteditable',
       lineWrapping: true,
       viewportMargin: Infinity,
-      extraKeys: {
-        'F11': function (cm) {
-          cm.setOption('fullScreen', !cm.getOption('fullScreen'))
-        },
-        'Esc': function (cm) {
-          if (cm.getOption('fullScreen')) cm.setOption('fullScreen', false)
-        }
-      }
+      keyMap: 'sublime'
     })
     let _self = this
     editor.on('change', editor => {
