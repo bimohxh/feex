@@ -18,7 +18,9 @@ module.exports = {
   */
   loading: { color: '#3B8070' },
   css: [
-    '~assets/css/main.css'
+    'codemirror/lib/codemirror.css',
+    '~assets/css/main.css',
+    '~assets/css/code-theme.css'
   ],
   /*
   ** Build configuration

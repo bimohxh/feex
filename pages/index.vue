@@ -18,11 +18,14 @@
         
     div.editor-box
       div.left(v-show="isLeftShow")
-        div.catalog-box
-          div.cate-group(v-for="cat in catalogs")
-            div.cate-1 {{cat.name}}
-            div.cate-2(v-for="sub in cat.subs")
-              a(href="") {{sub.name}}
+        div
+          code-structure
+        // 目录
+        // div.catalog-box
+        //   div.cate-group(v-for="cat in catalogs")
+        //     div.cate-1 {{cat.name}}
+        //     div.cate-2(v-for="sub in cat.subs")
+        //       a(href="") {{sub.name}}
 
       div.middle
         div.code-box
@@ -37,6 +40,7 @@
 </template>
 
 <script>
+import CodeStructure from '~/components/code-structure'
 const initHtml = `<!doctype html>
 <html>
   <head>
@@ -117,6 +121,7 @@ export default {
     }
   },
   components: {
+    CodeStructure
   },
   watch: {
     comcon: function () {
@@ -138,7 +143,6 @@ export default {
   },
   mounted () {
     var CodeMirror = require('codemirror')
-    require('codemirror/lib/codemirror.css')
     require('codemirror/addon/edit/closetag.js')
     require('codemirror/addon/fold/xml-fold.js')
     require('codemirror/mode/xml/xml.js')
@@ -154,7 +158,8 @@ export default {
       inputStyle: 'contenteditable',
       lineWrapping: true,
       viewportMargin: Infinity,
-      keyMap: 'sublime'
+      keyMap: 'sublime',
+      theme: 'vscode'
     })
     let _self = this
     editor.on('change', editor => {

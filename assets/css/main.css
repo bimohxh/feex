@@ -5,6 +5,7 @@ html, body {
   font-size: 14px;
   line-height: 20px;
   color: #333;
+  text-rendering: optimizeLegibility;
 }
 
 html {
@@ -29,19 +30,5 @@ html {
   font-weight: 400;
   src: local('Coda Regular'), local('Coda-Regular'), url(~assets/font/coda.woff2) format('woff2');
   unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-}
-
-
-
-.CodeMirror {
-  font-family: 'code'!important;
-  height: auto!important;
-  font-size: 15px;
-  line-height: 22px;
-}
-
-.cm-comment {
-  font-size: 13px;
-  color: #c8c4c2!important;
 }
 
