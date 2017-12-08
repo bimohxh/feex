@@ -18,14 +18,20 @@
         
     div.editor-box
       div.left(v-show="isLeftShow")
-        div
-          // code-structure
-        // 目录
-        div.catalog-box
-          div.cate-group(v-for="cat in catalogs")
-            div.cate-1 {{cat.name}}
-            div.cate-2(v-for="sub in cat.subs")
-              a(href="") {{sub.name}}
+        div.left-top-bar
+          h3 Bootstrap从入门
+        div.left-menu
+          a(href="javascript:void(0)" @click="leftView = 'catalog'" v-bind:class="'active-' + (leftView === 'catalog')") 目录
+          a(href="javascript:void(0)" @click="leftView = 'structure'"  v-bind:class="'active-' + (leftView === 'structure')") 文件
+        //文件结构
+        div.left-content
+          code-structure(v-show="leftView === 'structure'")
+          // 目录
+          div.catalog-box(v-show="leftView === 'catalog'")
+            div.cate-group(v-for="cat in catalogs")
+              div.cate-1 {{cat.name}}
+              div.cate-2(v-for="sub in cat.subs")
+                a(href="") {{sub.name}}
 
       div.middle
         div.code-box#code-box
@@ -79,6 +85,7 @@ export default {
       isRealTimePreview: false,
       isLeftShow: true,
       isRightShow: false,
+      leftView: 'catalog',
       catalogs: [
         {
           name: '基础用法',
@@ -165,6 +172,7 @@ export default {
     }
   },
   mounted () {
+    this.resizeBar()
     var CodeMirror = require('codemirror')
     require('codemirror/addon/edit/closetag.js')
     require('codemirror/addon/fold/xml-fold.js')
@@ -190,7 +198,6 @@ export default {
       _self.resizeBar()
     })
     editor.setValue(initHtml)
-    this.resizeBar()
   }
 }
 </script>
@@ -250,15 +257,59 @@ export default {
         width: 300px;
         flex-shrink: 0;
 
-        .catalog-box {
+        .left-top-bar {
+          position: fixed;
+          height: 50px;
+          width: 300px;
+          background-color: #FFF;
+          top: 0;
+          left: 0;
+          box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+          display: flex;
+          align-items: center;
+          padding: 0 10px;
+          word-break: keep-all;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .left-menu {
           position: fixed;
           background-color: #FFF;
-          top: 0px;
+          box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+          top: 51px;
+          height: 30px;
+          width: 300px;
+          left: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          a {
+            padding: 0 10px;
+            color: #444;
+
+            &.active-true {
+              color: #E64A19
+            }
+          }
+        }
+
+        .left-content {
+          position: fixed;
+          background-color: #FFF;
+          top: 82px;
           bottom: 0px;
           width: 300px;
           left: 0;
+          flex-shrink: 0;
           box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
           overflow-y: auto;
+        }
+
+        .catalog-box {
+          padding: 20px;
           .cate-group {
             margin-bottom: 20px;
           }
@@ -348,16 +399,6 @@ export default {
           }
         }
       }
-    }
-
-    .catalog-box {
-      position: relative;
-      width: 300px;
-      padding: 20px;
-      bottom: 50px;
-      background-color: #FFF;
-      flex-shrink: 0;
-      margin-right: 10px;
     }
   }
 </style>
