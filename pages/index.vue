@@ -1,20 +1,20 @@
 <template lang="pug">
   div.main
-    div.headbar
-      div.left
-        h3 Vue.js 入门到精通
-      div.middle
-        div.view-vis
-          a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" v-bind:class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
-            span 目录
-          // a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 代码
-          a(href="javascript:void(0)" @click="isRightShow = !isRightShow" v-bind:class="'oper-btn on-' + isRightShow")
-            span 预览
+    // div.headbar
+    //   div.left
+    //     h3 Vue.js 入门到精通
+    //   div.middle
+    //     div.view-vis
+    //       a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" v-bind:class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
+    //         span 目录
+    //       // a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 代码
+    //       a(href="javascript:void(0)" @click="isRightShow = !isRightShow" v-bind:class="'oper-btn on-' + isRightShow")
+    //         span 预览
 
-      div.right
-        a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" v-bind:class="'oper-btn on-' + isRealTimePreview") 实时预览
-        a(href="javascript:void(0)" @click="run")
-          icon(name="run")
+    //   div.right
+    //     a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" v-bind:class="'oper-btn on-' + isRealTimePreview") 实时预览
+    //     a(href="javascript:void(0)" @click="run")
+    //       icon(name="run")
         
     div.editor-box
       div.left(v-show="isLeftShow")
@@ -28,10 +28,18 @@
               a(href="") {{sub.name}}
 
       div.middle
-        div.code-box
-          div.code-info
-            h3.title
-              icon(name="file" width="18px") demo/index.html
+        div.code-box#code-box
+          div.code-info#code-info
+            div.left-info
+              a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow")
+                icon(name="list" width="18px")
+            div.middle-info
+              h3.title demo/index.html
+            div.right-info
+              a(href="javascript:void(0)" @click="run")
+                icon(name="run-o")
+              a(href="javascript:void(0)" @click="isRightShow = !isRightShow")
+                icon(name="list" width="18px")
           div.code-inner
             textarea(id="code" name="code")
         
@@ -43,6 +51,7 @@
 
 <script>
 import CodeStructure from '~/components/code-structure'
+import $ from 'jquery'
 const initHtml = `<!doctype html>
 <html>
   <head>
@@ -130,6 +139,12 @@ export default {
       if (this.isRealTimePreview) {
         this.run()
       }
+    },
+    isLeftShow: function () {
+      this.resizeBar()
+    },
+    isRightShow: function () {
+      this.resizeBar()
     }
   },
   methods: {
@@ -141,6 +156,12 @@ export default {
       preview.write(_html)
       preview.close()
       this.isRightShow = true
+    },
+    resizeBar: function () {
+      setTimeout(function () {
+        console.log($('#code-box').width())
+        $('#code-info').css('width', $('#code-box').width())
+      })
     }
   },
   mounted () {
@@ -166,9 +187,10 @@ export default {
     let _self = this
     editor.on('change', editor => {
       _self.comcon = editor.getValue()
+      _self.resizeBar()
     })
-
     editor.setValue(initHtml)
+    this.resizeBar()
   }
 }
 </script>
@@ -231,7 +253,7 @@ export default {
         .catalog-box {
           position: fixed;
           background-color: #FFF;
-          top: 50px;
+          top: 0px;
           bottom: 0px;
           width: 300px;
           left: 0;
@@ -274,9 +296,24 @@ export default {
             background-color: #fff;
             padding: 20px 10px;
             box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
-
+            position: fixed;
+            z-index: 10;
+            display: flex;
+            top: 0px;
             .title {
               color: #7d818a
+            }
+           
+            .middle-info {
+              flex-grow: 1;
+              padding: 0 10px;
+              text-align: center;
+            }
+
+            .right-info {
+              a {
+                margin-left: 10px;
+              }
             }
           }
 
@@ -298,7 +335,7 @@ export default {
         .preview-box {
           position: fixed;
           background-color: #FFF;
-          top: 60px;
+          top: 0px;
           bottom: 10px;
           width: 500px;
           right: 0;
