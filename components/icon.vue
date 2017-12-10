@@ -1,7 +1,6 @@
 <template lang="pug">
   span.v-icon(:class="alone")
-    svg(:style="{width: (width || 20) + 'px', height: (width || 20) + 'px'}")
-      use(:xlink:href="'#' + name")
+    v-icon(:name="name"  v-bind:style="{width: width || '20px', height: width || '20px', transform: `rotate(${rotate || 0}deg) scale(${scaleDdata[0]},${scaleDdata[1]})`}")
     span
       slot
 </template>
@@ -10,8 +9,9 @@
 <script>
   export default {
     props: ['name', 'width', 'height', 'rotate', 'alone', 'scale'],
-    data () {
-      return {
+    computed: {
+      scaleDdata: function () {
+        return this.scale || [1, 1]
       }
     }
   }
@@ -25,17 +25,14 @@
     span {
       display: inline-block;
     }
-
     svg {
       margin-right: 3px;
     }
-
     &.true {
       svg {
         margin-right: 0;
       }
     }
   }
-
   
 </style>

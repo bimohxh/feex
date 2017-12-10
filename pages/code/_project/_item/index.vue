@@ -5,14 +5,14 @@
         h3 Vue.js 入门到精通
       div.middle
         div.view-vis
-          a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" :class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
-            icon(name="navicon" width="16") 目录
+          a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" v-bind:class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
+            // icon(name="navicon" width="16") 目录
           // a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 代码
-          a(href="javascript:void(0)" @click="isRightShow = !isRightShow" :class="'oper-btn on-' + isRightShow")
-            icon(name="eye" width="15") 预览
+          a(href="javascript:void(0)" @click="isRightShow = !isRightShow" v-bind:class="'oper-btn on-' + isRightShow")
+            // icon(name="eye" width="15") 预览
 
       div.right
-        a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 实时预览
+        a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" v-bind:class="'oper-btn on-' + isRealTimePreview") 实时预览
         a(href="javascript:void(0)" @click="run")
           icon(name="run")
         

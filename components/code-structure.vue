@@ -1,41 +1,78 @@
 <template lang="pug">
   div.structure-box
-    div.struct-item(v-for="item in structures")
-      div.struct-left
-        span.s-name {{item.name}}
-      div.struct-right
-
+    code-structure-item(v-for="item in structures" v-bind:item="item")
 </template>
 
 <script>
+import CodeStructureItem from '~/components/code-structure-item.vue'
+var structures = [
+  {
+    id: 1,
+    name: 'index.html',
+    type: 'file',
+    origion: 'url',
+    url: '',
+    file_id: 13,
+    parent: 0
+  },
+  {
+    id: 2,
+    name: 'config.json',
+    type: 'file'
+  },
+  {
+    id: 3,
+    name: '图片',
+    type: 'folder'
+  },
+  {
+    id: 4,
+    name: 'css',
+    type: 'folder',
+    children: [
+      {
+        id: 5,
+        name: 'index.css',
+        type: 'file',
+        origion: 'url',
+        url: '',
+        file_id: 13,
+        parent: 0
+      },
+      {
+        id: 6,
+        name: 'layout.css',
+        type: 'file',
+        origion: 'url',
+        url: '',
+        file_id: 13,
+        parent: 0
+      }
+    ]
+  },
+  {
+    id: 7,
+    name: 'js',
+    type: 'folder'
+  }
+]
 export default {
   data () {
     return {
-      structures: [
-        {
-          id: 1,
-          name: 'index.html',
-          type: 'file',
-          origion: 'url',
-          url: '',
-          file_id: 13,
-          parent: 0,
-          children: []
-        },
-        {
-          name: 'config.json'
-        },
-        {
-          name: '图片'
-        },
-        {
-          name: 'css'
-        },
-        {
-          name: 'js'
-        }
-      ]
+      structures: []
     }
+  },
+  components: {
+    CodeStructureItem
+  },
+  created () {
+    this.structures = [{
+      id: 0,
+      name: 'app',
+      type: 'folder',
+      isRoot: true,
+      children: structures
+    }]
   }
 }
 </script>
@@ -52,30 +89,5 @@ export default {
   box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
   overflow-y: auto;
   font-size: 15px;
-
-  .struct-item {
-    padding: 10px;
-    display: flex;
-
-    .s-name {
-      color: #35495e;
-      font-size: .9em;
-      font-weight: 400;
-      line-height: 1em;
-      letter-spacing: .5px;
-      border-radius: 5px;
-      padding: 10px 5px;
-    }
-    
-    .struct-left {
-      flex-grow: 1
-    }
-
-    .struct-right {
-      width: 100px;
-      flex-shrink: 0;
-    }
-
-  }
 }
 </style>

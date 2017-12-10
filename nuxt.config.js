@@ -42,5 +42,5 @@ module.exports = {
       }
     }
   },
-  plugins: ['~/plugins/icon']
+  plugins: ['~/plugins/vue-icon', '~/plugins/icon']
 }
