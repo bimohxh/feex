@@ -6,10 +6,10 @@
       div.middle
         div.view-vis
           a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" v-bind:class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
-            // icon(name="navicon" width="16") 目录
+            span 目录
           // a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 代码
           a(href="javascript:void(0)" @click="isRightShow = !isRightShow" v-bind:class="'oper-btn on-' + isRightShow")
-            // icon(name="eye" width="15") 预览
+            span 预览
 
       div.right
         a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" v-bind:class="'oper-btn on-' + isRealTimePreview") 实时预览
@@ -19,19 +19,21 @@
     div.editor-box
       div.left(v-show="isLeftShow")
         div
-          code-structure
+          // code-structure
         // 目录
-        // div.catalog-box
-        //   div.cate-group(v-for="cat in catalogs")
-        //     div.cate-1 {{cat.name}}
-        //     div.cate-2(v-for="sub in cat.subs")
-        //       a(href="") {{sub.name}}
+        div.catalog-box
+          div.cate-group(v-for="cat in catalogs")
+            div.cate-1 {{cat.name}}
+            div.cate-2(v-for="sub in cat.subs")
+              a(href="") {{sub.name}}
 
       div.middle
         div.code-box
-          textarea(id="code" name="code")
-          
-
+          div.code-info
+            h3.title
+              icon(name="file" width="18px") demo/index.html
+          div.code-inner
+            textarea(id="code" name="code")
         
       div.right(v-show="isRightShow")
         div.preview-box
@@ -212,7 +214,7 @@ export default {
       .oper-btn {
         padding: 5px 5px;
         text-decoration: none;
-        border: #FFF 1px solid;
+        // border: #FFF 1px solid;
         font-size: 12px;
 
         &.on-true {
@@ -229,8 +231,8 @@ export default {
         .catalog-box {
           position: fixed;
           background-color: #FFF;
-          top: 60px;
-          bottom: 10px;
+          top: 50px;
+          bottom: 0px;
           width: 300px;
           left: 0;
           box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
@@ -265,11 +267,25 @@ export default {
           width: 100%;
           max-width: 800px;
           margin: 0 auto;
-          background-color: #fff;
           border-radius: 2px;
-          padding: 10px;
-          box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
           flex-grow: 1;
+
+          .code-info {
+            background-color: #fff;
+            padding: 20px 10px;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+
+            .title {
+              color: #7d818a
+            }
+          }
+
+          .code-inner {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+            margin-top: 10px;
+          }
         }
       }
 
