@@ -1,34 +1,53 @@
 <template lang="pug">
   div.main
-    div.headbar
-      div.left
-        h3 Vue.js 入门到精通
-      div.middle
-        div.view-vis
-          a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" v-bind:class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
-            // icon(name="navicon" width="16") 目录
-          // a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 代码
-          a(href="javascript:void(0)" @click="isRightShow = !isRightShow" v-bind:class="'oper-btn on-' + isRightShow")
-            // icon(name="eye" width="15") 预览
+    // div.headbar
+    //   div.left
+    //     h3 Vue.js 入门到精通
+    //   div.middle
+    //     div.view-vis
+    //       a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" v-bind:class="'oper-btn on-' + isLeftShow" style="border-right: 0;")
+    //         span 目录
+    //       // a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" :class="'oper-btn on-' + isRealTimePreview") 代码
+    //       a(href="javascript:void(0)" @click="isRightShow = !isRightShow" v-bind:class="'oper-btn on-' + isRightShow")
+    //         span 预览
 
-      div.right
-        a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" v-bind:class="'oper-btn on-' + isRealTimePreview") 实时预览
-        a(href="javascript:void(0)" @click="run")
-          icon(name="run")
+    //   div.right
+    //     a(href="javascript:void(0)" @click="isRealTimePreview = !isRealTimePreview" v-bind:class="'oper-btn on-' + isRealTimePreview") 实时预览
+    //     a(href="javascript:void(0)" @click="run")
+    //       icon(name="run")
         
     div.editor-box
       div.left(v-show="isLeftShow")
-        div.catalog-box
-          div.cate-group(v-for="cat in catalogs")
-            div.cate-1 {{cat.name}}
-            div.cate-2(v-for="sub in cat.subs")
-              a(href="") {{sub.name}}
+        div.left-top-bar
+          h3 Bootstrap从入门
+        div.left-menu
+          a(href="javascript:void(0)" @click="leftView = 'catalog'" v-bind:class="'active-' + (leftView === 'catalog')") 目录
+          a(href="javascript:void(0)" @click="leftView = 'structure'"  v-bind:class="'active-' + (leftView === 'structure')") 文件
+        //文件结构
+        div.left-content
+          code-structure(v-show="leftView === 'structure'")
+          // 目录
+          div.catalog-box(v-show="leftView === 'catalog'")
+            div.cate-group(v-for="cat in catalogs")
+              div.cate-1 {{cat.name}}
+              div.cate-2(v-for="sub in cat.subs")
+                a(href="") {{sub.name}}
 
       div.middle
-        div.code-box
-          textarea(id="code" name="code")
-          
-
+        div.code-box#code-box
+          div.code-info#code-info
+            div.left-info
+              a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow")
+                icon(name="list" width="18px")
+            div.middle-info
+              h3.title demo/index.html
+            div.right-info
+              a(href="javascript:void(0)" @click="run")
+                icon(name="run-o")
+              a(href="javascript:void(0)" @click="isRightShow = !isRightShow")
+                icon(name="list" width="18px")
+          div.code-inner
+            textarea(id="code" name="code")
         
       div.right(v-show="isRightShow")
         div.preview-box
@@ -37,8 +56,8 @@
 </template>
 
 <script>
-import axios from '~/plugins/axios'
-
+import CodeStructure from '~/components/code-structure'
+import $ from 'jquery'
 const initHtml = `<!doctype html>
 <html>
   <head>
@@ -66,6 +85,7 @@ export default {
       isRealTimePreview: false,
       isLeftShow: true,
       isRightShow: false,
+      leftView: 'catalog',
       catalogs: [
         {
           name: '基础用法',
@@ -119,19 +139,22 @@ export default {
     }
   },
   components: {
+    CodeStructure
   },
   watch: {
     comcon: function () {
       if (this.isRealTimePreview) {
         this.run()
       }
+    },
+    isLeftShow: function () {
+      this.resizeBar()
+    },
+    isRightShow: function () {
+      this.resizeBar()
     }
   },
   methods: {
-    fetchCatalogs: async function () {
-      let res = await axios().get('feex/catalog')
-      this.catalogs = res.data
-    },
     run: function () {
       let _html = this.comcon
       let previewFrame = document.getElementById('preview')
@@ -140,19 +163,25 @@ export default {
       preview.write(_html)
       preview.close()
       this.isRightShow = true
+    },
+    resizeBar: function () {
+      setTimeout(function () {
+        console.log($('#code-box').width())
+        $('#code-info').css('width', $('#code-box').width())
+      })
     }
   },
   mounted () {
+    this.resizeBar()
     var CodeMirror = require('codemirror')
-    require('codemirror/lib/codemirror.css')
     require('codemirror/addon/edit/closetag.js')
     require('codemirror/addon/fold/xml-fold.js')
     require('codemirror/mode/xml/xml.js')
     require('codemirror/mode/javascript/javascript.js')
     require('codemirror/mode/css/css.js')
     require('codemirror/mode/htmlmixed/htmlmixed.js')
-    require('codemirror/addon/display/fullscreen.css')
-    require('codemirror/addon/display/fullscreen.js')
+    require('codemirror/addon/comment/comment.js')
+    require('codemirror/keymap/sublime.js')
 
     editor = CodeMirror.fromTextArea(document.getElementById('code'), {
       mode: 'text/html',
@@ -160,20 +189,14 @@ export default {
       inputStyle: 'contenteditable',
       lineWrapping: true,
       viewportMargin: Infinity,
-      extraKeys: {
-        'F11': function (cm) {
-          cm.setOption('fullScreen', !cm.getOption('fullScreen'))
-        },
-        'Esc': function (cm) {
-          if (cm.getOption('fullScreen')) cm.setOption('fullScreen', false)
-        }
-      }
+      keyMap: 'sublime',
+      theme: 'vscode'
     })
     let _self = this
     editor.on('change', editor => {
       _self.comcon = editor.getValue()
+      _self.resizeBar()
     })
-
     editor.setValue(initHtml)
   }
 }
@@ -220,7 +243,7 @@ export default {
       .oper-btn {
         padding: 5px 5px;
         text-decoration: none;
-        border: #FFF 1px solid;
+        // border: #FFF 1px solid;
         font-size: 12px;
 
         &.on-true {
@@ -234,15 +257,59 @@ export default {
         width: 300px;
         flex-shrink: 0;
 
-        .catalog-box {
+        .left-top-bar {
           position: fixed;
-          background-color: #FFF;
-          top: 60px;
-          bottom: 10px;
+          height: 50px;
           width: 300px;
+          background-color: #FFF;
+          top: 0;
           left: 0;
           box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+          display: flex;
+          align-items: center;
+          padding: 0 10px;
+          word-break: keep-all;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .left-menu {
+          position: fixed;
+          background-color: #FFF;
+          box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+          top: 51px;
+          height: 30px;
+          width: 300px;
+          left: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          a {
+            padding: 0 10px;
+            color: #444;
+
+            &.active-true {
+              color: #E64A19
+            }
+          }
+        }
+
+        .left-content {
+          position: fixed;
+          background-color: #FFF;
+          top: 82px;
+          bottom: 0px;
+          width: 300px;
+          left: 0;
+          flex-shrink: 0;
+          box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
           overflow-y: auto;
+        }
+
+        .catalog-box {
+          padding: 20px;
           .cate-group {
             margin-bottom: 20px;
           }
@@ -273,11 +340,40 @@ export default {
           width: 100%;
           max-width: 800px;
           margin: 0 auto;
-          background-color: #fff;
           border-radius: 2px;
-          padding: 10px;
-          box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
           flex-grow: 1;
+
+          .code-info {
+            background-color: #fff;
+            padding: 20px 10px;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+            position: fixed;
+            z-index: 10;
+            display: flex;
+            top: 0px;
+            .title {
+              color: #7d818a
+            }
+           
+            .middle-info {
+              flex-grow: 1;
+              padding: 0 10px;
+              text-align: center;
+            }
+
+            .right-info {
+              a {
+                margin-left: 10px;
+              }
+            }
+          }
+
+          .code-inner {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+            margin-top: 10px;
+          }
         }
       }
 
@@ -290,7 +386,7 @@ export default {
         .preview-box {
           position: fixed;
           background-color: #FFF;
-          top: 60px;
+          top: 0px;
           bottom: 10px;
           width: 500px;
           right: 0;
@@ -303,16 +399,6 @@ export default {
           }
         }
       }
-    }
-
-    .catalog-box {
-      position: relative;
-      width: 300px;
-      padding: 20px;
-      bottom: 50px;
-      background-color: #FFF;
-      flex-shrink: 0;
-      margin-right: 10px;
     }
   }
 </style>
