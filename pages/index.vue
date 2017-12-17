@@ -3,7 +3,7 @@
     div.feex-list
       nuxt-link(class="feex-item" v-for="item in feexs" v-bind:to="'/feex/' + item.id")
         div.left
-          img.cover(src="~/assets/img/cover.png")
+          img.cover(:src="cdn(item.cover, 'feex', 'feex')")
         div.right
           h4 {{item.title}}
           div.desc {{item.summary}}
@@ -39,7 +39,7 @@ export default {
     
     .feex-item {
       display: flex;
-      padding: 20px;
+      padding: 25px 20px;
       background-color: #FFF;
       border-bottom: 1px solid #ededed;
       color: #333;

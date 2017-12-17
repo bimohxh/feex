@@ -2,7 +2,7 @@
   div.feex-box
     div.feex-item
       div.left
-        img.cover(src="~/assets/img/cover.png")
+        img.cover(:src="cdn(item.cover, 'feex', 'feex')")
       div.right
         h3 {{item.title}}
         div.desc {{item.summary}}

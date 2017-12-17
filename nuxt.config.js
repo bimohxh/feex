@@ -20,6 +20,7 @@ module.exports = {
   css: [
     'bootstrap/dist/css/bootstrap.css',
     'codemirror/lib/codemirror.css',
+    'animate.css',
     '~assets/css/main.css',
     '~assets/css/code-theme.css'
   ],
