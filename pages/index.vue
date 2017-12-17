@@ -1,11 +1,11 @@
 <template lang="pug">
   div.main
     div.feex-list
-      a.feex-item(v-for="item in feexs" href="#")
+      nuxt-link(class="feex-item" v-for="item in feexs" v-bind:to="'/feex/' + item.id")
         div.left
           img.cover(src="~/assets/img/cover.png")
         div.right
-          h3 {{item.title}}
+          h4 {{item.title}}
           div.desc {{item.summary}}
           div.mem-box
             img.mem-tx(:src="cdn(item.mem.avatar, 'mem')")
