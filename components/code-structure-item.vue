@@ -9,9 +9,9 @@
         a.oper-btn(href="javascript:void(0)"  title="删除" @click="destroy" v-if="!item.isRoot")
           icon(name="cha" width="11px")
         
-        a.oper-btn(href="javascript:void(0)" v-if="item.type === 'folder'" title="新增文件夹" @click="addFolder")
+        a.oper-btn(href="javascript:void(0)" v-if="item.type === 'folder'" title="新增文件夹" @click="addFile('folder')")
           icon(name="folder" width="12px")
-        a.oper-btn(href="javascript:void(0)" v-if="item.type === 'folder'" title="新增文件" @click="addFile")
+        a.oper-btn(href="javascript:void(0)" v-if="item.type === 'folder'" title="新增文件" @click="addFile('file')")
           icon(name="file" width="12px")
         
         a.oper-btn(href="javascript:void(0)"  title="编辑" @click="showEdit" v-show="!isEditing" v-if="!item.isRoot")
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import axios from '~/plugins/axios'
 export default {
   name: 'code-structure-item',
   props: ['item'],
@@ -49,33 +50,40 @@ export default {
       }
     },
     // 更新名字
-    updateName: function () {
-      this.isEditing = false
-      this.item.name = this.editname
+    updateName: async function () {
+      let res = await axios().put(`feex/structure`, {
+        id: this.item.id,
+        name: this.editname
+      })
+      if (res.data.status) {
+        this.isEditing = false
+        this.item.name = this.editname
+      } else {
+      }
     },
     // 新增文件夹
-    addFolder: function () {
-      this.item.children.push({
-        type: 'folder',
-        name: '未命名',
-        isEditing: true,
-        isNew: true
-      })
-    },
     // 新增文件
-    addFile: function () {
-      this.item.children.push({
-        type: 'file',
+    addFile: async function (type) {
+      let data = {
+        type: type || 'file',
         name: '未命名',
         isEditing: true,
-        isNew: true
-      })
+        isNew: true,
+        parent: this.item.id
+      }
+      let res = await axios().post(`feex/1/structure`, data)
+      let reitem = res.data.item
+      if (type === 'folder') {
+        reitem.children = []
+      }
+      this.item.children.push(reitem)
     },
     // 删除
-    destroy: function () {
+    destroy: async function () {
       if (!confirm('确定删除该文件？')) {
         return false
       }
+      await axios().delete(`feex/structure?id=${this.item.id}`)
       this.isDeleted = true
     }
   }
