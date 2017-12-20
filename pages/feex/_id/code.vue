@@ -5,17 +5,17 @@
         div.left-top-bar
           h3 Bootstrap从入门
         div.left-menu
-          a(href="javascript:void(0)" @click="switchLeft('catalog')" v-bind:class="'active-' + (leftView === 'catalog')") 目录
-          a(href="javascript:void(0)" @click="switchLeft('structure')"  v-bind:class="'active-' + (leftView === 'structure')") 文件
-          div(v-if="structmode === 'link'")
-            span 选择目录文件指向
-            button.btn.btn-danger.btn-sm(@click="linkSub") 确认连接
-
+          a(href="javascript:void(0)" @click="leftView = 'catalog'" v-bind:class="'active-' + (leftView === 'catalog')") 目录
+          a(href="javascript:void(0)" @click="leftView = 'structure'"  v-bind:class="'active-' + (leftView === 'structure')") 文件
         //文件结构
         div.left-content
-          code-structure(v-show="leftView === 'structure'" v-bind:mode="structmode" v-bind:showCode="showCode")
+          code-structure(v-show="leftView === 'structure'")
           // 目录
-          code-catalog(v-show="leftView === 'catalog'" v-bind:link="linkFile")
+          div.catalog-box(v-show="leftView === 'catalog'")
+            div.cate-group(v-for="cat in catalogs")
+              div.cate-1 {{cat.title}}
+              div.cate-2(v-for="sub in cat.subs")
+                a(href="") {{sub.title}}
 
       div.middle
         div.code-box#code-box
@@ -41,7 +41,6 @@
 
 <script>
 import CodeStructure from '~/components/code-structure'
-import CodeCatalog from '~/components/code-catalog'
 import axios from '~/plugins/axios'
 import $ from 'jquery'
 const initHtml = `<!doctype html>
@@ -73,13 +72,12 @@ export default {
       isLeftShow: true,
       isRightShow: false,
       leftView: 'catalog',
-      comcon: initHtml,
-      structmode: 'view'
+      catalogs: [],
+      comcon: initHtml
     }
   },
   components: {
-    CodeStructure,
-    CodeCatalog
+    CodeStructure
   },
   watch: {
     comcon: function () {
@@ -110,22 +108,27 @@ export default {
         $('#code-info').css('width', $('#code-box').width())
       })
     },
-    switchLeft: function (view) {
-      this.leftView = view
-      this.structmode = 'view'
-    },
-    linkFile: function () {
-      this.structmode = 'link'
-      this.leftView = 'structure'
-    },
-    linkSub: function () {
-    },
-    showCode: async function (item, from) {
-      if (from === 'structure') {
-        let res = await axios().get(`feex/structure_con?id=${item.id}`)
-        editor.setValue(res.data.con)
-      }
+    // 获取目录
+    fetchCatalogs: async function () {
+      let res = await axios().get(`feex/1/catalog`)
+      this.catalogs = res.data.items.reduce((result, item) => {
+        if (item.parent === 0) {
+          result.push(item)
+        } else {
+          let _parent = result.filter(sitem => {
+            return sitem.id === item.parent
+          })[0]
+          if (_parent) {
+            _parent.subs = _parent.subs || []
+            _parent.subs.push(item)
+          }
+        }
+        return result
+      }, [])
     }
+  },
+  created () {
+    this.fetchCatalogs()
   },
   mounted () {
     this.resizeBar()
@@ -262,6 +265,26 @@ export default {
           flex-shrink: 0;
           box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
           overflow-y: auto;
+        }
+
+        .catalog-box {
+          padding: 20px;
+          .cate-group {
+            margin-bottom: 20px;
+          }
+          .cate-1 {
+            color: #DDD;
+          }
+          
+          .cate-2 {
+            border-bottom: #EEE 1px solid;
+            border-bottom: 1px solid #eeeeee52;
+            padding: 8px 0;
+            a {
+              color: #333;
+              text-decoration: none;
+            }
+          }
         }
       }
 

@@ -1,6 +1,6 @@
 <template lang="pug">
   div.structure-box
-    code-structure-item(v-for="item in structures" v-bind:item="item")
+    code-structure-item(v-for="item in structures" v-bind:item="item" v-bind:mode="mode" v-bind:showCode="showCode")
 </template>
 
 <script>
@@ -35,6 +35,7 @@ let formatList = (items) => {
 }
 
 export default {
+  props: ['mode', 'showCode'],
   data () {
     return {
       structures: []

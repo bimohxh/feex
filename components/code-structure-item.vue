@@ -2,8 +2,9 @@
   div.struct-item(v-if="!isDeleted")
     div.current
       div.struct-left
+        input.check(type="radio" name="check-default" v-if="item.type === 'file' && mode === 'link'")
         icon(:name="item.type" width="15px")
-        a.s-name(href="#" v-show="!isEditing") {{item.name}}
+        a.s-name(href="javascript:void(0)" v-show="!isEditing" @click="showCode(item, 'structure')") {{item.name}}
         input.txt(type="text" spellcheck="false" v-bind:id="'structname-' + item.id" v-on:blur="blurEdit" v-show="isEditing" v-model="editname" v-on:keyup.enter="updateName")
       div.struct-right
         a.oper-btn(href="javascript:void(0)"  title="删除" @click="destroy" v-if="!item.isRoot")
@@ -17,14 +18,14 @@
         a.oper-btn(href="javascript:void(0)"  title="编辑" @click="showEdit" v-show="!isEditing" v-if="!item.isRoot")
           icon(name="pen" width="12px")
 
-    code-structure-item(v-for="sub in item.children" v-bind:item="sub")   
+    code-structure-item(v-for="sub in item.children" v-bind:item="sub" v-bind:mode="mode" v-bind:showCode="showCode")   
 </template>
 
 <script>
 import axios from '~/plugins/axios'
 export default {
   name: 'code-structure-item',
-  props: ['item'],
+  props: ['item', 'mode', 'showCode'],
   data () {
     return {
       editname: '',
@@ -122,6 +123,9 @@ export default {
 
       .txt {
         width: 100px;
+      }
+      .check {
+        margin-right: 5px;
       }
     }
 
