@@ -21,8 +21,8 @@ module.exports = {
     'bootstrap/dist/css/bootstrap.css',
     'codemirror/lib/codemirror.css',
     'animate.css',
-    '~assets/css/main.css',
-    '~assets/css/code-theme.css'
+    '~assets/css/main.css'
+    // '~assets/css/code-theme.css'
   ],
   router: {
     // 在每页渲染前运行 middleware/user-agent.js 中间件的逻辑

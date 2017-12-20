@@ -11,11 +11,7 @@
         div.left-content
           code-structure(v-show="leftView === 'structure'")
           // 目录
-          div.catalog-box(v-show="leftView === 'catalog'")
-            div.cate-group(v-for="cat in catalogs")
-              div.cate-1 {{cat.title}}
-              div.cate-2(v-for="sub in cat.subs")
-                a(href="") {{sub.title}}
+          code-catalog(v-show="leftView === 'catalog'")
 
       div.middle
         div.code-box#code-box
@@ -41,7 +37,7 @@
 
 <script>
 import CodeStructure from '~/components/code-structure'
-import axios from '~/plugins/axios'
+import CodeCatalog from '~/components/code-catalog'
 import $ from 'jquery'
 const initHtml = `<!doctype html>
 <html>
@@ -65,18 +61,19 @@ const initHtml = `<!doctype html>
 
 var editor
 export default {
+  layout: 'blank',
   data () {
     return {
       isRealTimePreview: false,
       isLeftShow: true,
       isRightShow: false,
       leftView: 'catalog',
-      catalogs: [],
       comcon: initHtml
     }
   },
   components: {
-    CodeStructure
+    CodeStructure,
+    CodeCatalog
   },
   watch: {
     comcon: function () {
@@ -106,28 +103,7 @@ export default {
         console.log($('#code-box').width())
         $('#code-info').css('width', $('#code-box').width())
       })
-    },
-    // 获取目录
-    fetchCatalogs: async function () {
-      let res = await axios().get(`feex/1/catalog`)
-      this.catalogs = res.data.items.reduce((result, item) => {
-        if (item.parent === 0) {
-          result.push(item)
-        } else {
-          let _parent = result.filter(sitem => {
-            return sitem.id === item.parent
-          })[0]
-          if (_parent) {
-            _parent.subs = _parent.subs || []
-            _parent.subs.push(item)
-          }
-        }
-        return result
-      }, [])
     }
-  },
-  created () {
-    this.fetchCatalogs()
   },
   mounted () {
     this.resizeBar()
@@ -147,8 +123,8 @@ export default {
       inputStyle: 'contenteditable',
       lineWrapping: true,
       viewportMargin: Infinity,
-      keyMap: 'sublime',
-      theme: 'vscode'
+      keyMap: 'sublime'
+      // theme: 'vscode'
     })
     let _self = this
     editor.on('change', editor => {
@@ -264,26 +240,6 @@ export default {
           flex-shrink: 0;
           box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
           overflow-y: auto;
-        }
-
-        .catalog-box {
-          padding: 20px;
-          .cate-group {
-            margin-bottom: 20px;
-          }
-          .cate-1 {
-            color: #DDD;
-          }
-          
-          .cate-2 {
-            border-bottom: #EEE 1px solid;
-            border-bottom: 1px solid #eeeeee52;
-            padding: 8px 0;
-            a {
-              color: #333;
-              text-decoration: none;
-            }
-          }
         }
       }
 
