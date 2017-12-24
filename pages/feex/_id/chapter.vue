@@ -3,7 +3,11 @@
     div.editor-box
       div.left(v-show="isLeftShow")
         div.left-top-bar
-          h3 Bootstrap从入门
+          nuxt-link(to="")
+            img.logo(src="~/assets/img/logo-50.png")
+          h5 前端小例
+          // h5
+          //   strong Bootstrap从入门
         div.left-menu
           a(href="javascript:void(0)" @click="switchLeft('catalog')" v-bind:class="'active-' + (leftView === 'catalog')") 目录
           a(href="javascript:void(0)" @click="switchLeft('structure')"  v-bind:class="'active-' + (leftView === 'structure')") 文件
@@ -21,15 +25,16 @@
         div.code-box#code-box
           div.code-info#code-info
             div.left-info
-              a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow")
-                icon(name="list" width="18px")
+              a.fold(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" )
+                icon(name="arrow-left" width="18px" v-bind:class="'to-right-' +!isLeftShow")
+              span.filename demo/index.html
             div.middle-info
-              h3.title demo/index.html
+              // h3.title demo/index.html
             div.right-info
               a(href="javascript:void(0)" @click="run")
                 icon(name="run-o")
-              a(href="javascript:void(0)" @click="isRightShow = !isRightShow")
-                icon(name="list" width="18px")
+              a.fold(href="javascript:void(0)" @click="isRightShow = !isRightShow" )
+                icon(name="arrow-left" width="18px" v-bind:class="'to-right-' + isRightShow")
           div.code-inner
             textarea(id="code" name="code")
         
@@ -228,6 +233,19 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          display: flex;
+          align-items: center;
+
+          h5 {
+            margin: 0;
+            padding: 0;
+            color: #db562e;
+          }
+
+          .logo {
+            width: 30px;
+            margin-right: 10px;
+          }
         }
 
         .left-menu {
@@ -290,6 +308,21 @@ export default {
             .title {
               color: #7d818a
             }
+
+            .filename {
+              font-size: 15px;
+              margin-left: 10px;
+              color: #DDD;
+              letter-spacing: 0.5px;
+            }
+
+            a:link, a:visited {
+              color: #bcbcbc
+            }
+
+            a:hover, a:active {
+              color: #333
+            }
            
             .middle-info {
               flex-grow: 1;
@@ -302,13 +335,23 @@ export default {
                 margin-left: 10px;
               }
             }
+
+            .fold {
+              .to-right-true {
+                transform: rotate(180deg)
+              }
+
+              * {
+                transition: transform 0.3s;
+              }
+            }
           }
 
           .code-inner {
             background-color: #fff;
             padding: 10px;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
-            margin-top: 10px;
+            box-shadow: 0 1px 12px 0 rgba(0,0,0,.05);
+            // margin-top: 10px;
           }
         }
       }
@@ -323,7 +366,7 @@ export default {
           position: fixed;
           background-color: #FFF;
           top: 0px;
-          bottom: 10px;
+          bottom: 0px;
           width: 500px;
           right: 0;
           box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
