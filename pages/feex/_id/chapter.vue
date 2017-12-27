@@ -3,7 +3,7 @@
     div.editor-box
       div.left(v-show="isLeftShow")
         div.left-top-bar
-          h3 Bootstrap从入门
+          h4 Bootstrap从入门
         div.left-menu
           a(href="javascript:void(0)" @click="switchLeft('catalog')" v-bind:class="'active-' + (leftView === 'catalog')") 目录
           a(href="javascript:void(0)" @click="switchLeft('structure')"  v-bind:class="'active-' + (leftView === 'structure')") 文件
@@ -18,16 +18,21 @@
           code-catalog(v-show="leftView === 'catalog'" v-bind:link="linkFile")
 
       div.middle
-        div.code-box#code-box
+        div.code-box#code-box(v-show="checkedStructure")
           div.code-info#code-info
             div.left-info
               a(href="javascript:void(0)" @click="isLeftShow = !isLeftShow")
                 icon(name="list" width="18px")
-            div.middle-info
-              h3.title demo/index.html
+            div.middle-info(v-if="checkedStructure")
+              h3.title {{checkedStructure.path}}
             div.right-info
-              a(href="javascript:void(0)" @click="run")
-                icon(name="run-o")
+              template(v-if="checkedStructure && checkedStructure.file_from === 'file'")
+                a(href="javascript:void(0)" title="保存" @click="save")
+                  icon(name="save" width="18px")
+
+                a(href="javascript:void(0)" @click="run")
+                  icon(name="run-o")
+              
               a(href="javascript:void(0)" @click="isRightShow = !isRightShow")
                 icon(name="list" width="18px")
           div.code-inner
@@ -65,6 +70,7 @@ const initHtml = `<!doctype html>
 </html>`
 
 var editor
+var CodeMirror
 export default {
   layout: 'blank',
   data () {
@@ -74,7 +80,8 @@ export default {
       isRightShow: false,
       leftView: 'catalog',
       comcon: initHtml,
-      structmode: 'view'
+      structmode: 'view',
+      checkedStructure: null
     }
   },
   components: {
@@ -95,6 +102,7 @@ export default {
     }
   },
   methods: {
+    // 运行
     run: function () {
       let _html = this.comcon
       let previewFrame = document.getElementById('preview')
@@ -120,40 +128,55 @@ export default {
     },
     linkSub: function () {
     },
+    // 选中文件 显示代码
     showCode: async function (item, from) {
       if (from === 'structure') {
+        this.checkedStructure = item
+        let exta = {
+          css: 'text/css',
+          js: 'text/javascript'
+        }[item.name.split('.').pop()]
+        editor.setOption('mode', exta || 'text/html')
         let res = await axios().get(`feex/structure_con?id=${item.id}`)
-        editor.setValue(res.data.con)
+        editor.setValue(res.data.con || '')
       }
+    },
+    // 保存
+    save: async function () {
+      await axios().put(`feex/structure`, {
+        id: this.checkedStructure.id,
+        file_con: this.comcon
+      })
+    },
+    initEditor: function (mode) {
+      CodeMirror = require('codemirror')
+      require('codemirror/addon/edit/closetag.js')
+      require('codemirror/addon/fold/xml-fold.js')
+      require('codemirror/mode/xml/xml.js')
+      require('codemirror/mode/javascript/javascript.js')
+      require('codemirror/mode/css/css.js')
+      require('codemirror/mode/htmlmixed/htmlmixed.js')
+      require('codemirror/addon/comment/comment.js')
+      require('codemirror/keymap/sublime.js')
+      editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+        mode: 'text/html',
+        autoCloseTags: true,
+        inputStyle: 'contenteditable',
+        lineWrapping: true,
+        viewportMargin: Infinity,
+        keyMap: 'sublime'
+        // theme: 'vscode'
+      })
+      let _self = this
+      editor.on('change', editor => {
+        _self.comcon = editor.getValue()
+        _self.resizeBar()
+      })
     }
   },
   mounted () {
     this.resizeBar()
-    var CodeMirror = require('codemirror')
-    require('codemirror/addon/edit/closetag.js')
-    require('codemirror/addon/fold/xml-fold.js')
-    require('codemirror/mode/xml/xml.js')
-    require('codemirror/mode/javascript/javascript.js')
-    require('codemirror/mode/css/css.js')
-    require('codemirror/mode/htmlmixed/htmlmixed.js')
-    require('codemirror/addon/comment/comment.js')
-    require('codemirror/keymap/sublime.js')
-
-    editor = CodeMirror.fromTextArea(document.getElementById('code'), {
-      mode: 'text/html',
-      autoCloseTags: true,
-      inputStyle: 'contenteditable',
-      lineWrapping: true,
-      viewportMargin: Infinity,
-      keyMap: 'sublime'
-      // theme: 'vscode'
-    })
-    let _self = this
-    editor.on('change', editor => {
-      _self.comcon = editor.getValue()
-      _self.resizeBar()
-    })
-    editor.setValue(initHtml)
+    this.initEditor()
   }
 }
 </script>

@@ -4,7 +4,9 @@
       div.struct-left
         input.check(type="radio" name="check-default" v-if="item.type === 'file' && mode === 'link'")
         icon(:name="item.type" width="15px")
-        a.s-name(href="javascript:void(0)" v-show="!isEditing" @click="showCode(item, 'structure')") {{item.name}}
+        template(v-show="!isEditing")
+          a.s-name(href="javascript:void(0)" @click="showCode(item, 'structure')" v-if="item.type == 'file'") {{item.name}}
+          span(v-else) {{item.name}}
         input.txt(type="text" spellcheck="false" v-bind:id="'structname-' + item.id" v-on:blur="blurEdit" v-show="isEditing" v-model="editname" v-on:keyup.enter="updateName")
       div.struct-right
         a.oper-btn(href="javascript:void(0)"  title="删除" @click="destroy" v-if="!item.isRoot")
@@ -18,19 +20,27 @@
         a.oper-btn(href="javascript:void(0)"  title="编辑" @click="showEdit" v-show="!isEditing" v-if="!item.isRoot")
           icon(name="pen" width="12px")
 
-    code-structure-item(v-for="sub in item.children" v-bind:item="sub" v-bind:mode="mode" v-bind:showCode="showCode")   
+    code-structure-item(v-for="sub in item.children" v-bind:item="sub" v-bind:mode="mode" v-bind:showCode="showCode" v-bind:path="item.path")   
 </template>
 
 <script>
 import axios from '~/plugins/axios'
 export default {
   name: 'code-structure-item',
-  props: ['item', 'mode', 'showCode'],
+  props: ['item', 'mode', 'showCode', 'path'],
   data () {
     return {
       editname: '',
       isEditing: this.item.isEditing,
       isDeleted: false
+    }
+  },
+  watch: {
+    'item.name': function () {
+      this.getPath()
+    },
+    'path': function () {
+      this.getPath()
     }
   },
   methods: {
@@ -70,7 +80,8 @@ export default {
         name: '未命名',
         isEditing: true,
         isNew: true,
-        parent: this.item.id
+        parent: this.item.id,
+        file_from: 'file'
       }
       let res = await axios().post(`feex/1/structure`, data)
       let reitem = res.data.item
@@ -86,7 +97,13 @@ export default {
       }
       await axios().delete(`feex/structure?id=${this.item.id}`)
       this.isDeleted = true
+    },
+    getPath: function () {
+      this.item.path = `/${this.path}/${this.item.name}`.replace(/^\/+app\//, '').replace(/^\/+/, '')
     }
+  },
+  created () {
+    this.getPath()
   }
 }
 </script>

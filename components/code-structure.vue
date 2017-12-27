@@ -1,6 +1,6 @@
 <template lang="pug">
   div.structure-box
-    code-structure-item(v-for="item in structures" v-bind:item="item" v-bind:mode="mode" v-bind:showCode="showCode")
+    code-structure-item(v-for="item in structures" v-bind:item="item" v-bind:mode="mode" v-bind:showCode="showCode" v-bind:path="''")
 </template>
 
 <script>
@@ -10,6 +10,7 @@ import axios from '~/plugins/axios'
 // 格式化列表
 let formatItem = (item, items) => {
   item.children = []
+  item.path = ''
   items.forEach(subitem => {
     if (subitem.parent === item.id) {
       item.children.push(subitem)
