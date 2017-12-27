@@ -4,10 +4,11 @@
       div.struct-left
         input.check(type="radio" name="check-default" v-if="item.type === 'file' && mode === 'link'")
         icon(:name="item.type" width="15px")
-        template(v-show="!isEditing")
+        template(v-if="!isEditing")
           a.s-name(href="javascript:void(0)" @click="showCode(item, 'structure')" v-if="item.type == 'file'") {{item.name}}
           span(v-else) {{item.name}}
-        input.txt(type="text" spellcheck="false" v-bind:id="'structname-' + item.id" v-on:blur="blurEdit" v-show="isEditing" v-model="editname" v-on:keyup.enter="updateName")
+        template(v-if="isEditing")
+          input.txt(type="text" spellcheck="false" v-bind:id="'structname-' + item.id" v-on:blur="blurEdit" v-model="editname" v-on:keyup.enter="updateName")
       div.struct-right
         a.oper-btn(href="javascript:void(0)"  title="删除" @click="destroy" v-if="!item.isRoot")
           icon(name="cha" width="11px")
@@ -31,7 +32,8 @@ export default {
   data () {
     return {
       editname: '',
-      isEditing: this.item.isEditing,
+      // isEditing: this.item.isEditing,
+      isEditing: false,
       isDeleted: false
     }
   },
@@ -112,7 +114,8 @@ export default {
 <style lang="scss" scoped>
   .struct-item {
     padding-left: 15px;
-    
+    font-family: 'Roboto Mono';
+    font-size: 14px;
   }
   .current {
     padding: 0 10px;
@@ -122,10 +125,10 @@ export default {
     height: 30px;
 
     .s-name {
-      font-size: .9em;
+      // font-size: .9em;
       font-weight: 400;
       line-height: 1em;
-      letter-spacing: .5px;
+      // letter-spacing: .5px;
       border-radius: 5px;
     }
     
