@@ -51,6 +51,8 @@ import CodeStructure from '~/components/code-structure'
 import CodeCatalog from '~/components/code-catalog'
 import axios from '~/plugins/axios'
 import $ from 'jquery'
+const Config = require('../../../config')
+const APIURL = Config ? Config.API : 'https://api.awesomes.cn/'
 const initHtml = `<!doctype html>
 <html>
   <head>
@@ -70,9 +72,9 @@ const initHtml = `<!doctype html>
 
   </body>
 </html>`
-
 var editor
 var CodeMirror
+
 export default {
   layout: 'blank',
   data () {
@@ -106,12 +108,13 @@ export default {
   methods: {
     // 运行
     run: function () {
+      window.document.domain = window.location.hostname.replace(/^[a-zA-Z]+\./, '')
       let _html = this.comcon
       let previewFrame = document.getElementById('preview')
-      var preview = previewFrame.contentDocument || previewFrame.contentWindow.document
-      preview.open()
-      preview.write(_html)
-      preview.close()
+      previewFrame.src = `${APIURL}sandbox/1/feex`
+      setTimeout(function () {
+        previewFrame.contentWindow.postMessage(_html, APIURL)
+      }, 100)
       this.isRightShow = true
     },
     resizeBar: function () {
