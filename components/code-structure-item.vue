@@ -18,6 +18,11 @@
         a.oper-btn(href="javascript:void(0)" v-if="item.type === 'folder'" title="新增文件" @click="addFile('file')")
           icon(name="file" width="12px")
         
+        span.oper-btn(v-if="item.type === 'folder'")
+          a(href="javascript:void(0)" title="上传文件")
+            icon(name="upload" width="12px")
+          upload-html5(v-bind:flag="item.id" v-bind:success="uploadSuccess" folder="feex" v-bind:progress="progress")
+        
         a.oper-btn(href="javascript:void(0)"  title="编辑" @click="showEdit" v-show="!isEditing" v-if="!item.isRoot")
           icon(name="pen" width="12px")
 
@@ -26,6 +31,7 @@
 
 <script>
 import axios from '~/plugins/axios'
+import UploadHtml5 from '~/components/upload-html5'
 export default {
   name: 'code-structure-item',
   props: ['item', 'mode', 'showCode', 'path'],
@@ -37,6 +43,9 @@ export default {
       isDeleted: false
     }
   },
+  components: {
+    UploadHtml5
+  },
   watch: {
     'item.name': function () {
       this.getPath()
@@ -46,6 +55,13 @@ export default {
     }
   },
   methods: {
+    uploadSuccess: function (original, filename) {
+      this.addFile('file', {
+        name: original,
+        file_from: 'upload',
+        file_upload: filename
+      })
+    },
     // 显示编辑
     showEdit: function () {
       this.isEditing = true
@@ -76,16 +92,16 @@ export default {
     },
     // 新增文件夹
     // 新增文件
-    addFile: async function (type) {
-      let data = {
-        type: type || 'file',
+    addFile: async function (type, option) {
+      option = option || {
         name: '未命名',
-        isEditing: true,
-        isNew: true,
-        parent: this.item.id,
         file_from: 'file'
       }
-      let res = await axios().post(`feex/1/structure`, data)
+      option.parent = this.item.id
+      option.isNew = true
+      option.isEditing = true
+      option.type = type || 'file'
+      let res = await axios().post(`feex/1/structure`, option)
       let reitem = res.data.item
       if (type === 'folder') {
         reitem.children = []
@@ -102,6 +118,9 @@ export default {
     },
     getPath: function () {
       this.item.path = `/${this.path}/${this.item.name}`.replace(/^\/+app\//, '').replace(/^\/+/, '')
+    },
+    progress: function (per) {
+      console.log('===', per)
     }
   },
   created () {
@@ -150,14 +169,19 @@ export default {
     }
 
     .struct-right {
-      width: 100px;
+      width: 120px;
       flex-shrink: 0;
       text-align: right;
+      display: flex;
     }
 
     .oper-btn {
       margin-left: 6px;
       display: none;
+      width: 15px;
+      height: 20px;
+      position: relative;
+      overflow: hidden;
     }
 
     &:hover {
