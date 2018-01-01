@@ -19,10 +19,10 @@
         div.left-content
           code-structure(v-show="leftView === 'structure'" v-bind:mode="structmode" v-bind:showCode="showCode")
           // 目录
-          code-catalog(v-show="leftView === 'catalog'" v-bind:link="linkFile")
+          code-catalog(v-show="leftView === 'catalog'" v-bind:link="linkFile" v-bind:showCode="showCode" v-bind:active="checkedCatalog")
 
       div.middle
-        div.code-box#code-box(v-show="checkedStructure")
+        div.code-box#code-box(v-show="checkedStructure || (checkedCatalog && checkedCatalog.feex_structure_id > 0)")
           div.code-info#code-info
             div.left-info
               a.fold(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" )
@@ -39,6 +39,9 @@
                   icon(name="arrow-left" width="18px" v-bind:class="'to-right-' + isRightShow")
           div.code-inner
             textarea(id="code" name="code")
+        div.st-no-link(v-show="checkedCatalog && !checkedCatalog.feex_structure_id")
+          h4 当前目录选项未绑定文件
+          p 请点击左侧关联文件选择要指定的文件
         
       div.right(v-show="isRightShow")
         div.preview-box
@@ -85,7 +88,8 @@ export default {
       leftView: 'catalog',
       comcon: initHtml,
       structmode: 'view',
-      checkedStructure: null
+      checkedStructure: null,
+      checkedCatalog: null
     }
   },
   components: {
@@ -134,17 +138,36 @@ export default {
     linkSub: function () {
     },
     // 选中文件 显示代码
+    showStuctureCode: async function (stid) {
+      let res = await axios().get(`feex_structure/${stid}`)
+      let item = res.data
+      this.checkedStructure = item
+      let exta = {
+        css: 'text/css',
+        js: 'text/javascript',
+        md: 'markdown'
+      }[item.name.split('.').pop().toLocaleLowerCase()]
+      editor.setOption('mode', exta || 'text/html')
+      editor.setValue(item.file_con || '')
+    },
     showCode: async function (item, from) {
       if (from === 'structure') {
+        if (item.file_from === 'upload') {
+          window.open(this.cdn(item.file_upload, 'feex'))
+          return
+        }
         this.checkedStructure = item
-        let exta = {
-          css: 'text/css',
-          js: 'text/javascript',
-          md: 'markdown'
-        }[item.name.split('.').pop().toLocaleLowerCase()]
-        editor.setOption('mode', exta || 'text/html')
-        let res = await axios().get(`feex/structure_con?id=${item.id}`)
-        editor.setValue(res.data.con || '')
+        this.checkedCatalog = null
+        this.showStuctureCode(item.id)
+      }
+      if (from === 'catalog') {
+        this.checkedStructure = null
+        this.checkedCatalog = item
+        if (item.feex_structure_id > 0) {
+          this.showStuctureCode(item.feex_structure_id)
+        } else {
+          this.isRightShow = false
+        }
       }
     },
     // 保存
@@ -314,6 +337,11 @@ export default {
         width: 0;
         padding: 10px;
         padding-top: 0;
+
+        .st-no-link {
+          text-align: center;
+          color: #bab7b7;
+        }
 
         .code-box {
           width: 100%;

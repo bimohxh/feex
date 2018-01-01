@@ -159,6 +159,7 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      flex-grow: 1;
 
       .txt {
         width: 100px;
@@ -169,7 +170,6 @@ export default {
     }
 
     .struct-right {
-      width: 120px;
       flex-shrink: 0;
       text-align: right;
       display: flex;

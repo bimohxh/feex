@@ -21,7 +21,7 @@ div.catalog-box
         
       div.cate-2(v-for="(sub, subindex) in cat.subs" v-if="!sub.isDeleted")
         div.name-box
-          a.title-flag(href="javascript:void(0)" v-show="!sub.isEditing") {{sub.title}}
+          a.title-flag(href="javascript:void(0)" v-show="!sub.isEditing" @click="showCode(sub, 'catalog')") {{sub.title}}
           input.txt(type="text" spellcheck="false" v-bind:id="'catalogtitle-' + sub.id" v-on:blur="blurEdit(sub)" v-show="sub.isEditing" v-model="sub.edititle" v-on:keyup.enter="updateTitle(sub)")
         div.oper-box
           a(href="javascript:void(0)" title="删除"  @click="destroy(sub)")
@@ -34,6 +34,7 @@ div.catalog-box
             icon(name="up" width="12px")
           a(href="javascript:void(0)"  title="编辑" @click="showEdit(sub)")
             icon(name="pen" width="12px")
+        div.state-active(v-if="active && active.id === sub.id")
   a.addfirstbtn(href="javascript:void(0)" @click="addnew()") 新增一级目录   
 </template>
 
@@ -49,7 +50,7 @@ let formatItem = (item) => {
   }
 }
 export default {
-  props: ['link'],
+  props: ['link', 'showCode', 'active'],
   data () {
     return {
       catalogs: []
@@ -187,6 +188,7 @@ export default {
 
   .cate-1, .cate-2 {
     display: flex;
+    align-items: center;
 
     &:hover {
       .oper-box {
@@ -216,6 +218,15 @@ export default {
           color: #333
         }
       }
+    }
+
+    .state-active {
+      width: 10px;
+      height: 10px;
+      background-color: #DDD;
+      border-radius: 100%;
+      margin-left: 5px;
+      background-color: #13cc1b;
     }
 
   }
