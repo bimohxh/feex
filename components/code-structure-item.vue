@@ -2,7 +2,7 @@
   div.struct-item(v-if="!isDeleted")
     div.current
       div.struct-left
-        input.check(type="radio" name="check-default" v-if="item.type === 'file' && mode === 'link'")
+        input.check(type="radio" name="confile" v-bind:checked="item.id === checkedCatalog.feex_structure_id"  @click="connect(item)" v-if="item.type === 'file' && mode === 'connect'")
         icon(:name="item.type" width="15px")
         template(v-if="!isEditing")
           a.s-name(href="javascript:void(0)" @click="showCode(item, 'structure')" v-if="item.type == 'file'") {{item.name}}
@@ -26,7 +26,7 @@
         a.oper-btn(href="javascript:void(0)"  title="编辑" @click="showEdit" v-show="!isEditing" v-if="!item.isRoot")
           icon(name="pen" width="12px")
 
-    code-structure-item(v-for="sub in item.children" v-bind:item="sub" v-bind:mode="mode" v-bind:showCode="showCode" v-bind:path="item.path")   
+    code-structure-item(v-for="sub in item.children" v-bind:item="sub" v-bind:mode="mode" v-bind:showCode="showCode" v-bind:path="item.path" v-bind:connect="connect" v-bind:checkedCatalog="checkedCatalog")   
 </template>
 
 <script>
@@ -34,7 +34,7 @@ import axios from '~/plugins/axios'
 import UploadHtml5 from '~/components/upload-html5'
 export default {
   name: 'code-structure-item',
-  props: ['item', 'mode', 'showCode', 'path'],
+  props: ['item', 'mode', 'showCode', 'path', 'connect', 'checkedCatalog'],
   data () {
     return {
       editname: '',
@@ -80,8 +80,7 @@ export default {
     },
     // 更新名字
     updateName: async function () {
-      let res = await axios().put(`feex/structure`, {
-        id: this.item.id,
+      let res = await axios().put(`feex_structure/${this.item.id}`, {
         name: this.editname
       })
       if (res.data.status) {
@@ -113,7 +112,7 @@ export default {
       if (!confirm('确定删除该文件？')) {
         return false
       }
-      await axios().delete(`feex/structure?id=${this.item.id}`)
+      await axios().delete(`feex_structure/${this.item.id}`)
       this.isDeleted = true
     },
     getPath: function () {

@@ -26,8 +26,8 @@ div.catalog-box
         div.oper-box
           a(href="javascript:void(0)" title="删除"  @click="destroy(sub)")
             icon(name="cha" width="11px")
-          a(href="javascript:void(0)"  title="关联文件" @click="link(sub)")
-            icon(name="link" width="13px")
+          // a(href="javascript:void(0)"  title="关联文件" @click="link(sub)")
+          //   icon(name="link" width="13px")
           a.oper-btn(href="javascript:void(0)" title="下移"  @click="move(sub, subindex, 'down', cat)" v-show="subindex < cat.subs.length - 1")
             icon(name="down" width="12px")
           a.oper-btn(href="javascript:void(0)" title="上移" @click="move(sub, subindex, 'up', cat)" v-show="subindex > 0")
@@ -101,8 +101,7 @@ export default {
 
     // 更新名字
     updateTitle: async function (item) {
-      let res = await axios().put(`feex/catalog`, {
-        id: item.id,
+      let res = await axios().put(`feex_catalog/${item.id}`, {
         title: item.edititle
       })
       if (res.data.status) {
@@ -130,7 +129,7 @@ export default {
       if (!confirm('确定删除该文件？')) {
         return false
       }
-      await axios().delete(`feex/catalog?id=${item.id}`)
+      await axios().delete(`feex_catalog/${item.id}`)
       item.isDeleted = true
     },
 
@@ -146,7 +145,7 @@ export default {
         switchIndex = index + 1
       }
       let switchObj = list[switchIndex]
-      await axios().put(`feex/catalog_sort`, {
+      await axios().put(`feex_catalog/sort`, {
         dist: [item.id, switchObj.id]
       })
       let tmp = item.ordernum

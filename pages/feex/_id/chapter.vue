@@ -11,38 +11,38 @@
         div.left-menu
           a(href="javascript:void(0)" @click="switchLeft('catalog')" v-bind:class="'active-' + (leftView === 'catalog')") 目录
           a(href="javascript:void(0)" @click="switchLeft('structure')"  v-bind:class="'active-' + (leftView === 'structure')") 文件
-          div(v-if="structmode === 'link'")
-            span 选择目录文件指向
-            button.btn.btn-danger.btn-sm(@click="linkSub") 确认连接
 
         //文件结构
         div.left-content
-          code-structure(v-show="leftView === 'structure'" v-bind:mode="structmode" v-bind:showCode="showCode")
+          code-structure(v-show="leftView === 'structure'" mode="view" v-bind:showCode="showCode")
           // 目录
           code-catalog(v-show="leftView === 'catalog'" v-bind:link="linkFile" v-bind:showCode="showCode" v-bind:active="checkedCatalog")
 
       div.middle
-        div.code-box#code-box(v-show="checkedStructure || (checkedCatalog && checkedCatalog.feex_structure_id > 0)")
-          div.code-info#code-info
-            div.left-info
-              a.fold(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" )
-                icon(name="arrow-left" width="18px" v-bind:class="'to-right-' +!isLeftShow")
-              span.filename(v-if="checkedStructure") {{checkedStructure.path}}
-            div.middle-info
-            div.right-info
-              template(v-if="checkedStructure && checkedStructure.file_from === 'file'")
-                a(href="javascript:void(0)" title="保存" @click="save")
-                  icon(name="save" width="18px")
-                a(href="javascript:void(0)" @click="run")
-                  icon(name="run-o")
-                a.fold(href="javascript:void(0)" @click="isRightShow = !isRightShow" )
-                  icon(name="arrow-left" width="18px" v-bind:class="'to-right-' + isRightShow")
-          div.code-inner
-            textarea(id="code" name="code")
-        div.st-no-link(v-show="checkedCatalog && !checkedCatalog.feex_structure_id")
-          h4 当前目录选项未绑定文件
-          p 请点击左侧关联文件选择要指定的文件
-        
+        template
+          div.code-box#code-box(v-show="!showResetConnect && (checkedStructure || (checkedCatalog && checkedCatalog.feex_structure_id > 0))")
+            div.code-info#code-info
+              div.left-info
+                a.fold(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" )
+                  icon(name="arrow-left" width="18px" v-bind:class="'to-right-' +!isLeftShow")
+                span.filename(v-if="checkedStructure") {{checkedStructure.path}}
+                a(href="javascript:void(0)"  title="重新关联文件" @click="showResetConnect = true" v-show="checkedCatalog" style="margin-left: 10px;")
+                  icon(name="link" width="18px")
+              div.middle-info
+              div.right-info
+                template(v-if="checkedStructure && checkedStructure.file_from === 'file'")
+                  a(href="javascript:void(0)" title="保存" @click="save")
+                    icon(name="save" width="18px")
+                  a(href="javascript:void(0)" @click="run")
+                    icon(name="run-o")
+                  a.fold(href="javascript:void(0)" @click="isRightShow = !isRightShow" )
+                    icon(name="arrow-left" width="18px" v-bind:class="'to-right-' + isRightShow")
+            div.code-inner
+              textarea(id="code" name="code")
+        div.st-no-link(v-if="checkedCatalog && (!checkedCatalog.feex_structure_id || showResetConnect)")
+          h4 绑定文件
+          code-structure(mode="connect" v-bind:showCode="showCode" v-bind:connect="connectFile" v-bind:checkedCatalog="checkedCatalog")
+          
       div.right(v-show="isRightShow")
         div.preview-box
           iframe#preview
@@ -87,9 +87,9 @@ export default {
       isRightShow: false,
       leftView: 'catalog',
       comcon: initHtml,
-      structmode: 'view',
       checkedStructure: null,
-      checkedCatalog: null
+      checkedCatalog: null,
+      showResetConnect: false
     }
   },
   components: {
@@ -129,10 +129,8 @@ export default {
     },
     switchLeft: function (view) {
       this.leftView = view
-      this.structmode = 'view'
     },
     linkFile: function () {
-      this.structmode = 'link'
       this.leftView = 'structure'
     },
     linkSub: function () {
@@ -151,6 +149,7 @@ export default {
       editor.setValue(item.file_con || '')
     },
     showCode: async function (item, from) {
+      this.showResetConnect = false
       if (from === 'structure') {
         if (item.file_from === 'upload') {
           window.open(this.cdn(item.file_upload, 'feex'))
@@ -172,10 +171,20 @@ export default {
     },
     // 保存
     save: async function () {
-      await axios().put(`feex/structure`, {
-        id: this.checkedStructure.id,
+      await axios().put(`feex_structure/${this.checkedStructure.id}`, {
         file_con: this.comcon
       })
+    },
+    connectFile: async function (item) {
+      let res = await axios().put(`feex_catalog/${this.checkedCatalog.id}`, {
+        feex_structure_id: item.id
+      })
+      if (res.data.status) {
+        let newitem = res.data.item
+        for (let key in newitem) {
+          this.checkedCatalog[key] = newitem[key]
+        }
+      }
     },
     initEditor: function (mode) {
       CodeMirror = require('codemirror')
@@ -202,6 +211,12 @@ export default {
         _self.comcon = editor.getValue()
         _self.resizeBar()
       })
+    },
+    // 设置标记背景色
+    setColor: function () {
+      let _cursor = editor.getDoc().getCursor()
+      $(`.CodeMirror-line:eq(${_cursor.line})`).addClass('markline')
+      console.log(_cursor)
     }
   },
   mounted () {
@@ -341,6 +356,11 @@ export default {
         .st-no-link {
           text-align: center;
           color: #bab7b7;
+          max-width: 500px;
+          margin: 0 auto;
+          background-color: #FFF;
+          box-shadow: 0 1px 12px 0 rgba(0,0,0,.05);
+          padding: 20px;
         }
 
         .code-box {
@@ -431,6 +451,10 @@ export default {
           }
         }
       }
+    }
+
+    .markline {
+      background-color: #f6f7d3;
     }
   }
 </style>
