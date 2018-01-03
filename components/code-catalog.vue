@@ -6,7 +6,7 @@ div.catalog-box
         div.name-box
           span.title-flag(v-show="!cat.isEditing") {{cat.title}}
           input.txt(type="text" spellcheck="false" v-bind:id="'catalogtitle-' + cat.id" v-on:blur="blurEdit(cat)" v-show="cat.isEditing" v-model="cat.edititle" v-on:keyup.enter="updateTitle(cat)")
-        div.oper-box
+        div.oper-box(v-if="isMyFeex")
           a(href="javascript:void(0)"  title="删除"  @click="destroy(cat)")
             icon(name="cha" width="11px")
           a.oper-btn(href="javascript:void(0)" title="下移" @click="move(cat, index, 'down')" v-show="index < catalogs.length - 1")
@@ -23,7 +23,7 @@ div.catalog-box
         div.name-box
           a.title-flag(href="javascript:void(0)" v-show="!sub.isEditing" @click="showCode(sub, 'catalog')") {{sub.title}}
           input.txt(type="text" spellcheck="false" v-bind:id="'catalogtitle-' + sub.id" v-on:blur="blurEdit(sub)" v-show="sub.isEditing" v-model="sub.edititle" v-on:keyup.enter="updateTitle(sub)")
-        div.oper-box
+        div.oper-box(v-if="isMyFeex")
           a(href="javascript:void(0)" title="删除"  @click="destroy(sub)")
             icon(name="cha" width="11px")
           // a(href="javascript:void(0)"  title="关联文件" @click="link(sub)")
@@ -35,7 +35,7 @@ div.catalog-box
           a(href="javascript:void(0)"  title="编辑" @click="showEdit(sub)")
             icon(name="pen" width="12px")
         div.state-active(v-if="active && active.id === sub.id")
-  a.addfirstbtn(href="javascript:void(0)" @click="addnew()") 新增一级目录   
+  a.addfirstbtn(href="javascript:void(0)" @click="addnew()" v-if="isMyFeex") 新增一级目录
 </template>
 
 <script>
@@ -50,10 +50,18 @@ let formatItem = (item) => {
   }
 }
 export default {
-  props: ['link', 'showCode', 'active'],
+  props: ['link', 'showCode', 'active', 'feex'],
   data () {
     return {
       catalogs: []
+    }
+  },
+  computed: {
+    session () {
+      return this.$store.state.session
+    },
+    isMyFeex () {
+      return this.feex.mem_id === (this.$store.state.session || {}).id
     }
   },
   methods: {

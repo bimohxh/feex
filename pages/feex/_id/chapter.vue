@@ -14,9 +14,9 @@
 
         //文件结构
         div.left-content
-          code-structure(v-show="leftView === 'structure'" mode="view" v-bind:showCode="showCode")
+          code-structure(v-show="leftView === 'structure'" mode="view" v-bind:showCode="showCode" v-bind:feex="feex")
           // 目录
-          code-catalog(v-show="leftView === 'catalog'" v-bind:link="linkFile" v-bind:showCode="showCode" v-bind:active="checkedCatalog")
+          code-catalog(v-show="leftView === 'catalog'" v-bind:link="linkFile" v-bind:showCode="showCode" v-bind:active="checkedCatalog" v-bind:feex="feex")
 
       div.middle
         template
@@ -31,7 +31,7 @@
               div.middle-info
               div.right-info
                 template(v-if="checkedStructure && checkedStructure.file_from === 'file'")
-                  a(href="javascript:void(0)" title="保存" @click="save")
+                  a(href="javascript:void(0)" title="保存" @click="save" v-if="isMyFeex")
                     icon(name="save" width="18px")
                   a(href="javascript:void(0)" @click="run")
                     icon(name="run-o")
@@ -80,6 +80,12 @@ var CodeMirror
 
 export default {
   layout: 'blank',
+  async asyncData ({params}) {
+    let res = await axios().get(`feex/${params.id}`)
+    return {
+      feex: res.data
+    }
+  },
   data () {
     return {
       isRealTimePreview: false,
@@ -90,6 +96,14 @@ export default {
       checkedStructure: null,
       checkedCatalog: null,
       showResetConnect: false
+    }
+  },
+  computed: {
+    session () {
+      return this.$store.state.session
+    },
+    isMyFeex () {
+      return this.feex.mem_id === (this.$store.state.session || {}).id
     }
   },
   components: {

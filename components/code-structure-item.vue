@@ -9,7 +9,7 @@
           span(v-else) {{item.name}}
         template(v-if="isEditing")
           input.txt(type="text" spellcheck="false" v-bind:id="'structname-' + item.id" v-on:blur="blurEdit" v-model="editname" v-on:keyup.enter="updateName")
-      div.struct-right
+      div.struct-right(v-if="isMyFeex")
         a.oper-btn(href="javascript:void(0)"  title="删除" @click="destroy" v-if="!item.isRoot")
           icon(name="cha" width="11px")
         
@@ -26,7 +26,7 @@
         a.oper-btn(href="javascript:void(0)"  title="编辑" @click="showEdit" v-show="!isEditing" v-if="!item.isRoot")
           icon(name="pen" width="12px")
 
-    code-structure-item(v-for="sub in item.children" v-bind:item="sub" v-bind:mode="mode" v-bind:showCode="showCode" v-bind:path="item.path" v-bind:connect="connect" v-bind:checkedCatalog="checkedCatalog")   
+    code-structure-item(v-for="sub in item.children" v-bind:item="sub" v-bind:mode="mode" v-bind:showCode="showCode" v-bind:path="item.path" v-bind:connect="connect" v-bind:checkedCatalog="checkedCatalog" v-bind:feex="feex")   
 </template>
 
 <script>
@@ -34,7 +34,7 @@ import axios from '~/plugins/axios'
 import UploadHtml5 from '~/components/upload-html5'
 export default {
   name: 'code-structure-item',
-  props: ['item', 'mode', 'showCode', 'path', 'connect', 'checkedCatalog'],
+  props: ['item', 'mode', 'showCode', 'path', 'connect', 'checkedCatalog', 'feex'],
   data () {
     return {
       editname: '',
@@ -45,6 +45,14 @@ export default {
   },
   components: {
     UploadHtml5
+  },
+  computed: {
+    session () {
+      return this.$store.state.session
+    },
+    isMyFeex () {
+      return this.feex.mem_id === (this.$store.state.session || {}).id
+    }
   },
   watch: {
     'item.name': function () {
