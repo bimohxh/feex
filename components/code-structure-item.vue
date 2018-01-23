@@ -51,7 +51,7 @@ export default {
       return this.$store.state.session
     },
     isMyFeex () {
-      return this.feex.mem_id === (this.$store.state.session || {}).id
+      return (this.feex || {}).mem_id === (this.$store.state.session || {}).id
     }
   },
   watch: {

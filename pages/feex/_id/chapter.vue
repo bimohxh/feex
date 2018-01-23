@@ -26,7 +26,7 @@
                 a.fold(href="javascript:void(0)" @click="isLeftShow = !isLeftShow" )
                   icon(name="arrow-left" width="18px" v-bind:class="'to-right-' +!isLeftShow")
                 span.filename(v-if="checkedStructure") {{checkedStructure.path}}
-                a(href="javascript:void(0)"  title="重新关联文件" @click="showResetConnect = true" v-show="checkedCatalog" style="margin-left: 10px;")
+                a(href="javascript:void(0)" v-if="isMyFeex"  title="重新关联文件" @click="showResetConnect = true" v-show="checkedCatalog" style="margin-left: 10px;")
                   icon(name="link" width="18px")
               div.middle-info
               div.right-info

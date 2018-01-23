@@ -11,7 +11,9 @@
           span {{item.mem.nc}}
         div.extra
           button.btn.btn-danger 购买 ￥{{item.price}}
-          button.btn.btn-outline-secondary 免费试学
+          nuxt-link(:to="'/feex/' + item.id  + '/chapter'" class="btn btn-outline-secondary") 免费试学
+        nuxt-link(:to="'/feex/' + item.id  + '/edit'" class="edit-btn" title="编辑" v-if="isMyFeex")
+          icon(name="pen" width="15px")
     div.buyer-box
       div
         icon(name="buy") {{item.sales}} 人已购买
@@ -54,6 +56,14 @@
         item: res.data,
         catalogs: _catalogs
       }
+    },
+    computed: {
+      session () {
+        return this.$store.state.session
+      },
+      isMyFeex () {
+        return this.item.mem_id === (this.$store.state.session || {}).id
+      }
     }
   }
 </script>
@@ -72,6 +82,7 @@
       display: flex;
       padding: 20px;
       border-bottom: 1px solid #eff1f1;
+      position: relative;
       color: #333;
 
       .left {
@@ -98,6 +109,13 @@
             margin-right: 15px;
           }
         }
+      }
+
+      .edit-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: #AAA;
       }
 
       .cover {
